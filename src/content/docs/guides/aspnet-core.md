@@ -1,5 +1,5 @@
 ---
-title: Example Guide
+title: ASP.NET Core
 description: A guide in my new Starlight docs site.
 ---
 

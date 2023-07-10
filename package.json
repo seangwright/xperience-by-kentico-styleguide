@@ -1,7 +1,7 @@
 {
-  "name": "",
+  "name": "xperience-by-kentico-styleguide",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -10,8 +10,8 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.4.2",
-    "astro": "2.7.0",
-    "sharp": "^0.32.1"
+    "@astrojs/starlight": "0.4.2",
+    "astro": "2.8.0",
+    "sharp": "0.32.1"
   }
 }

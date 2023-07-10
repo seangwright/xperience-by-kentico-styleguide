@@ -1,5 +1,5 @@
 ---
-title: Example Guide
+title: Page Builder
 description: A guide in my new Starlight docs site.
 ---
 
