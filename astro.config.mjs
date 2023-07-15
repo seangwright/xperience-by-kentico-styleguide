@@ -35,6 +35,7 @@ export default defineConfig({
         },
       ],
       lastUpdated: true,
+      customCss: ["./src/styles/site.css"],
     }),
   ],
 

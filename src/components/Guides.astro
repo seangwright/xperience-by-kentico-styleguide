@@ -1,11 +1,10 @@
 ---
 import { Card, CardGrid, Icon } from "@astrojs/starlight/components";
+import {} from "@astrojs/starlight";
 
 import { getCollection, getEntry } from "astro:content";
 
 const guides = await getCollection("docs", (e) => e.slug.includes("guides"));
-
-function getIcon() {}
 ---
 
 <CardGrid>
