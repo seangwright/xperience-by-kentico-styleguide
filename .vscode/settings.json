@@ -1,5 +1,7 @@
 {
   "files.associations": {
     "*.mdx": "astro"
-  }
+  },
+
+  "editor.formatOnSave": true
 }
