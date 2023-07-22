@@ -3,6 +3,9 @@ import starlight from "@astrojs/starlight";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://seangwriht.github.io",
+  base: "/xperience-by-kentico-styleguide",
+
   integrations: [
     starlight({
       title: "Xperience by Kentico Styleguide",
