@@ -1,12 +1,21 @@
 ---
 import { Icon } from "@astrojs/starlight/components";
+
+const size = "1.25rem";
+const color = "green";
 ---
 
-<div class="recommendation-status">
-  <Icon
-    name="approve-check-circle"
-    color="green"
-    label="Recommended"
-    class="heading-icon"
-  /> Recommended
-</div>
+<p>
+  <span
+    class="recommendation-status"
+    style=`--status-font-size: ${size}; --status-border-color: ${color}`
+  >
+    <Icon
+      name="approve-check-circle"
+      color={color}
+      size={size}
+      label="Recommended"
+      class="heading-icon"
+    /> Recommended
+  </span>
+</p>
