@@ -8,5 +8,11 @@ const guides = await getCollection("docs", (e) => e.slug.includes("guides"));
 ---
 
 <CardGrid>
-  {guides.map((guide) => <Card title={guide.data.title} icon="open-book" />)}
+  {
+    guides.map((guide) => (
+      <a href={`/${guide.slug}`}>
+        <Card title={guide.data.title} icon="open-book" />
+      </a>
+    ))
+  }
 </CardGrid>
