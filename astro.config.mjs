@@ -1,10 +1,12 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 
+const PROD = process.env.NODE_ENV === "production";
+
 // https://astro.build/config
 export default defineConfig({
-  site: "https://seangwriht.github.io",
-  base: "/xperience-by-kentico-styleguide",
+  site: PROD ? "https://seangwriht.github.io" : undefined,
+  base: PROD ? "/xperience-by-kentico-styleguide" : undefined,
 
   integrations: [
     starlight({
