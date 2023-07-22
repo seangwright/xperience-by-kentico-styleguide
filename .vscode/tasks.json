@@ -16,6 +16,14 @@
       "label": "npm: start",
       "detail": "run astro",
       "dependsOn": ["npm: install"]
+    },
+    {
+      "type": "npm",
+      "script": "build",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "npm: build",
+      "detail": "astro build"
     }
   ]
 }
