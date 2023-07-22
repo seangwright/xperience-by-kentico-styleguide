@@ -26,7 +26,24 @@ export default defineConfig({
       sidebar: [
         {
           label: "Guides",
-          autogenerate: { directory: "guides" },
+          items: [
+            {
+              label: "Solution Setup",
+              link: "/guides/solution-setup",
+            },
+            {
+              label: "Platform Customization",
+              link: "/guides/platform-customization",
+            },
+            {
+              label: "Admin Customization",
+              link: "/guides/admin-customization",
+            },
+            {
+              label: "Page Builder",
+              link: "/guides/page-builder",
+            },
+          ],
         },
         {
           label: "Examples",
