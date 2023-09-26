@@ -1,13 +1,11 @@
 ---
 title: Page Builder
-description: A guide in my new Starlight docs site.
+description: Guidance for using Xperience by Kentico's Page Builder technology.
 ---
 
 import Recommend from "/src/components/icons/Recommend.astro";
 import Suggest from "/src/components/icons/Suggest.astro";
 
-- Use Tag Helpers instead of HTML Helpers
-- Use the View Component Tag Helper
 - Use the Page Builder Mode Tag Helper for better Content Management UX
 
 ## Rendering
@@ -37,7 +35,7 @@ By using Tag Helpers, we can make our projects more accessible and welcoming to 
 Tag Helpers are much more common in ASP.NET Core projects than HTML Helpers and the built-in ASP.NET Core Tag Helpers
 are frequently used. We should align with the conventions of modern ASP.NET Core where Xperience enables us.
 
-## Sections
+## Components
 
 ### Avoid the Built-In Default Section
 
@@ -69,3 +67,169 @@ by creating a custom View at the following location in our project: `~/Views/Sha
 This will override the rendering of the built-in Default Section.
 
 :::
+
+### Co-locate Page Builder registration, types, and values
+
+<Recommend />
+
+- Define Page Template, Widget, and Section Identifiers close to their registration attributes
+- Define component Properties and View Model classes close to the components that use them
+- Define component registration attributes near where they are defined
+
+**Why?**
+
+Things that change together should stay together. A component should only be removed if its identifier is also removed.
+Keeping these two things close together helps ensure this consistency.
+
+**Why?**
+
+Navigation to the definition of a component identifier - if it's referenced through a variable -
+should bring a developer close to the definition of the associated component.
+
+**Why?**
+
+As [Joel Spolsky stated](https://www.joelonsoftware.com/2005/05/11/making-wrong-code-look-wrong/),
+"the more information about what code is doing is located right in front of your eyes, the better a job you'll do at finding the mistakes".
+
+:::danger[Don't]
+Don't put all component identifiers for your application in a single class.
+:::
+
+```csharp
+public static class ComponentIdentifiers
+{
+    // Sections
+    public const string SINGLE_COLUMN_SECTION = "KBank.SingleColumnSection";
+    public const string FORM_COLUMN_SECTION = "KBank.FormColumnSection";
+
+}
+```
+
+:::danger[Don't]
+Don't create separate files for component View Component, View Model and Properties classes
+and store them in various places in your project folders.
+:::
+
+```csharp
+// ~/Components/Widgets/Heading/HeadingWidget.cs
+public class HeadingWidget : ViewComponent
+{
+    // ...
+}
+
+// ~/Components/Widgets/Heading/HeadingWidgetProperties.cs
+public class HeadingWidgetProperties : IWidgetProperties
+{
+    //...
+}
+
+// ~/Components/Widgets/Heading/HeadingWidgetViewModel.cs
+public class HeadingWidgetViewModel
+{
+    //...
+}
+```
+
+:::tip[Do]
+Define components identifiers near their component and co-locate all related classes
+:::
+
+```csharp
+// ~/Components/Widgets/Heading/HeadingWideget.cs
+using Sandbox.Components.Sections.Heading;
+using Kentico.PageBuilder.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
+
+[assembly: RegisterSection(
+    identifier: HeadingSection.IDENTIFIER,
+    viewComponentType: typeof(HeadingSection),
+    name: "Heading",
+    propertiesType: typeof(HeadingSectionProperties),
+    Description = "Heading Section to be used at the top of a page",
+    IconClass = "icon-i"
+)]
+
+namespace Sandbox.Components.Sections.Heading;
+
+public class HeadingSection : ViewComponent
+{
+    public const string IDENTIFIER = "Sandbox.Sections.Heading";
+
+    public IViewComponentResult Invoke(ComponentViewModel<HeadingSectionProperties> vm)
+    {
+        var model = new HeadingSectionViewModel { };
+
+        View("~/Components/Sections/Heading/HeadingSection.cshtml", model);
+    }
+}
+
+public class HeadingSectionProperties : ISectionProperties { }
+
+public class HeadingSectionViewModel { }
+```
+
+### Access Component Identifiers through an Abstraction
+
+<Suggest />
+
+- Create a static abstraction to access component identifiers if their use is statically defined (typical)
+- Create an injectable service abstraction to access component identifiers if their use is dynamically defined (advnaced)
+
+**Why?**
+
+As mentioned above, component identifiers should be defined near the component definition, but accessing them
+for `<editable-area>` and `<widget-zone>` Tag Helpers should be convenient.
+
+**Why?**
+
+An abstraction can give developers easier discoverability of the components available in a solution.
+
+**Why?**
+
+If needed, the abstraction can be registered as a scoped service in the ASP.NET Core DI container
+and injected into the view.
+
+:::tip[Do]
+Create a simple abstraction to organize identifiers and include a static alias in the `_ViewImports.cshtml`
+for easy access.
+:::
+
+````csharp
+// ~/Components/Widgets/WidgetIdentifiers.cs
+namespace Sandbox.Components.Widgets;
+
+public static class WidgetIdentifiers
+{
+    public static class Accordions
+    {
+        public const string Accordion = AccordionWidget.IDENTIFER;
+    }
+
+    public static class Badges
+    {
+        public const string BadgesList = BadgesListWidget.IDENTIFIER;
+    }
+
+    public static class CTAs
+    {
+        public const string CTALink = CTALinkWidget.IDENTIFIER;
+        public const string CTAClinicalTrialLink = CTAClinicalTrialLinkWidget.IDENTIFIER;
+    }
+
+    public static class Forms
+    {
+        public const string Form = SystemComponentIdentifiers.FORM_WIDGET_IDENTIFIER;
+        public const string CTAForm = CTAFormWidget.IDENTIFIER;
+        public const string InlineForm = InlineFormWidget.IDENTIFIER;
+    }
+
+    // ...
+}
+
+```csharp
+
+````
+
+```
+
+```

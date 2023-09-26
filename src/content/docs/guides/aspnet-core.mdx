@@ -1,0 +1,105 @@
+---
+title: ASP.NET Core
+description: ASP.NET Core configuration and feature usage guidance for Xperience by Kentico.
+---
+
+import Recommend from "/src/components/icons/Recommend.astro";
+import Suggest from "/src/components/icons/Suggest.astro";
+
+## Razor
+
+### Use the View Component Tag Helper
+
+<Recommend />
+
+- Use the [View Component Tag Helper](https://learn.microsoft.com/en-us/aspnet/core/mvc/views/view-components?view=aspnetcore-7.0#invoke-a-view-component-as-a-tag-helper-1) (`<vc:>`)
+  in Razor Views
+
+**Why?**
+
+Tag Helpers help to add behavior to HTML rendering with Razor, but use an HTML-like syntax
+instead of C#, which can be easier to read, especially for developers not as familiar with C#.
+
+It's recommended to use the Xperience by Kentico Page Builder Tag Helpers, so following the convention
+for non-Xperience View Components follows this convention.
+
+**Why?**
+
+The View Component Tag Helper will provide syntax highlighting, auto-completion, and parameter hints in most editors.
+
+Invoking a View Component with C# [provides no type safety](https://learn.microsoft.com/en-us/aspnet/core/mvc/views/view-components?view=aspnetcore-7.0#invoke-a-view-component-1)
+for the component or its parameters, so it is almost always a worse developer experience than the View Component Tag Helper.
+
+:::danger[Don't]
+Don't use the `@await Component.InvokeAsync()` C# method to render View Components
+:::
+
+:::tip[Do]
+Use the `<vc:your-component />` Tag Helper to render View Components
+:::
+
+### Move Razor configuration to the application root
+
+<Recommend />
+
+- Move the `~/Views/_ViewImports.cshtml` file to the `~/` application root.
+- Move the `~/Views/_ViewImports.cshtml` file to the `~/` application root.
+
+**Why?**
+
+If we follow a Feature Folder based approach to project organization we will end up with Views, Templates, and Components
+outside the ASP.NET Core `~/Views` folder, which would prevent the `_ViewImports.cshtml` and `_ViewStart.cshtml` files
+from being applied for Views outside of the `~/View` folder.
+
+**Why?**
+
+The default ASP.NET Core template places the `_ViewImports.cshtml` and `_ViewStart.cshtml`
+files are stored in the `~/Views` folder, which is helpful when you have
+[ASP.NET Core Areas](https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/areas) in your app.
+
+Xperience by Kentico does not support Areas,
+so the [\_ViewImports.cshtml](https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/areas?view=aspnetcore-6.0#_viewimportscshtml)
+and [\_ViewStart.cshtml](https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/areas?view=aspnetcore-6.0#shared-layout-for-areas-using-the-_viewstartcshtml-file) files
+application root to ensure they are shared across the entire project's Razor Views.
+
+This is a valid location for these files in ASP.NET Core projects and is a better
+default for Xperience by Kentico projects heavy reliance on Razor template rendering.
+
+### Name View files by their Page or Component
+
+<Suggest />
+
+- Name your Razor View files to match the page or component they are used with
+- Drop the suffix from the `.cshtml` file name
+
+**Why?**
+
+Finding files through editor quick search (ex: ctrl+p or cmd+p in VS Code) often
+works by file name matching. Having dozens of files all named `Default.cshtml`
+for View Components can make it difficult to select the right one.
+
+A similar problem occurs when the file is open in an editor as a tab - the file
+name is too generic to be helpful.
+
+**Why**
+
+View Component, Page Template, and MVC View files should be organized by feature folder
+next to their component. This naming convention will alphabetically group the files in your editor.
+
+:::tip[Do]
+Name View files to match their use case.
+:::
+
+```
+🌳 ~/Features
+ |
+ ├─📁 Blog
+ |  ├── 📄 BlogPostPage_Default.cshtml
+ |  ├── 📄 BlogPostPageTemplates.cs
+ |  |── 📄 BlogLandingPage_Default.cshtml
+ |  ├── 📄 BlogLandingPageTemplates.cs
+ |  └── 📁 Components
+ |       ├── 📄 BlogPostDetail.cshtml
+ |       └── 📄 BlogPostDetailViewComponent.cs
+ └── ...
+```

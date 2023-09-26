@@ -42,6 +42,10 @@ export default defineConfig({
               link: "/guides/admin-customization",
             },
             {
+              label: "ASP.NET Core",
+              link: "/guides/aspnet-core",
+            },
+            {
               label: "Page Builder",
               link: "/guides/page-builder",
             },
