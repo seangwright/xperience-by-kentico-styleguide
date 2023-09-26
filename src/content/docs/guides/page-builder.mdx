@@ -1,0 +1,71 @@
+---
+title: Page Builder
+description: A guide in my new Starlight docs site.
+---
+
+import Recommend from "/src/components/icons/Recommend.astro";
+import Suggest from "/src/components/icons/Suggest.astro";
+
+- Use Tag Helpers instead of HTML Helpers
+- Use the View Component Tag Helper
+- Use the Page Builder Mode Tag Helper for better Content Management UX
+
+## Rendering
+
+### Use Tag Helpers intead of HTML Helpers
+
+<Recommend />
+
+- Update the `_ViewImports.cshtml` with `@addTagHelper` directives [to enable Xperience's Tag Helpers](https://docs.xperience.io/x/RofWCQ)
+- Only use Xperience's Tag Helpers in Razor Views
+- Avoid using [HTML Helpers](https://learn.microsoft.com/en-us/aspnet/mvc/overview/older-versions-1/views/creating-custom-html-helpers-cs)
+
+**Why?**
+
+Xperience by Kentico has kept `HtmlHelper` methods and extensions to make the upgrade from Kentico 12 MVC and Kentico Xperience 13 easier for teams.
+However, they are part of ASP.NET Core's legacy from MVC 5.
+[Tag Helpers](https://learn.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/intro?view=aspnetcore-7.0) were designed to replace Html Helpers.
+
+**Why?**
+
+Front-end developers who are more familiar with HTML than Razor and C# will have a harder time using and reading HTML Helpers than Tag Helpers
+because Tag Helpers look like and often behave like native HTML.
+By using Tag Helpers, we can make our projects more accessible and welcoming to developers new to ASP.NET Core.
+
+**Why?**
+
+Tag Helpers are much more common in ASP.NET Core projects than HTML Helpers and the built-in ASP.NET Core Tag Helpers
+are frequently used. We should align with the conventions of modern ASP.NET Core where Xperience enables us.
+
+## Sections
+
+### Avoid the Built-In Default Section
+
+<Suggest />
+
+- Create a new [Page Builder Section](https://docs.xperience.io/x/9AWiCQ) that uses your site's design
+- Assign it as a custom [default Section](https://docs.xperience.io/xp/developers-and-admins/development/builders/page-builder/sections-for-page-builder#SectionsforPageBuilder-Assignadefaultsection) for the application
+- Use `<editable-area />` `allowed-sections` [restrictions](https://docs.xperience.io/xp/developers-and-admins/development/builders/page-builder/create-pages-with-editable-areas#Createpageswitheditableareas-Configureallowedcomponentsforeditableareas) to exclude Xperience's Default Section from being used
+
+**Why?**
+
+The Page Builder is where structured content is composed with presentational experiences and design.
+A marketer's Page Builder experience should be tailored to their site's content and design requirements.
+
+**Why?**
+
+Xperience's included Default Section is great for enabling developers to get started quickly but it wasn't designed
+for _our_ site's needs.
+
+**Why?**
+
+We should be using the `allowed-widgets` and `allowed-sections` restrictions of each `<editable-area />` anyway.
+
+:::note
+
+If we want to use the built-in Default Section, we can still customize its design (but not functionality)
+by creating a custom View at the following location in our project: `~/Views/Shared/Kentico/PageBuilder/_DefaultSection.cshtml`
+
+This will override the rendering of the built-in Default Section.
+
+:::

@@ -1,0 +1,21 @@
+---
+import { Icon } from "@astrojs/starlight/components";
+
+const size = "1.25rem";
+const color = "goldenrod";
+---
+
+<p>
+  <span
+    class="recommendation-status"
+    style=`--status-font-size: ${size}; --status-border-color: ${color}`
+  >
+    <Icon
+      name="approve-check"
+      color={color}
+      label="Suggested"
+      class="heading-icon"
+      size={size}
+    /> Suggested
+  </span>
+</p>

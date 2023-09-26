@@ -1,0 +1,13 @@
+.heading-icon {
+  display: inline !important;
+  padding-right: 0.25rem;
+}
+
+.recommendation-status {
+  border-inline-start: 5px solid var(--sl-color-accent-high);
+  padding-inline-start: 0.5rem;
+  padding-block-end: 0.5rem;
+  font-size: var(--status-font-size);
+  border-bottom: 2px solid;
+  border-color: var(--status-border-color);
+}

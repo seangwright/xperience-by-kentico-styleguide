@@ -1,6 +1,8 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 
+const PROD = process.env.NODE_ENV === "production";
+
 // https://astro.build/config
 export default defineConfig({
   integrations: [
@@ -26,7 +28,24 @@ export default defineConfig({
       sidebar: [
         {
           label: "Guides",
-          autogenerate: { directory: "guides" },
+          items: [
+            {
+              label: "Solution Setup",
+              link: "/guides/solution-setup",
+            },
+            {
+              label: "Platform Customization",
+              link: "/guides/platform-customization",
+            },
+            {
+              label: "Admin Customization",
+              link: "/guides/admin-customization",
+            },
+            {
+              label: "Page Builder",
+              link: "/guides/page-builder",
+            },
+          ],
         },
         {
           label: "Examples",
@@ -35,6 +54,7 @@ export default defineConfig({
         },
       ],
       lastUpdated: true,
+      customCss: ["./src/styles/site.css"],
     }),
   ],
 
