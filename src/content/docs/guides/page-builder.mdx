@@ -8,7 +8,57 @@ import Suggest from "/src/components/icons/Suggest.astro";
 
 - Use the Page Builder Mode Tag Helper for better Content Management UX
 
-## Rendering
+## Routing
+
+### Default to using Page Templates (+ View Components)
+
+<Recommend />
+
+- Use Page Templates as the default rendering approach for [Content Tree Routing](https://docs.xperience.io/x/GoXWCQ)
+
+:::caution
+If you use Page Templates for a Page Type, and don't have a fallback Razor View for [Basic Routing](https://docs.xperience.io/x/HoXWCQ),
+then any Pages of this Page Type defined through the API will need to have their `DocumentPageTemplateConfiguration` field manually set with a valid value.
+
+You can resolve this by assigning a Page Template to a Page programmatically when it's created:
+
+```csharp
+var page = new HomePage();
+
+string config = JsonConvert.SerializeObject(
+  new { identifier = "Sandbox.HomePage" },
+  new JsonSerializerSettings
+  {
+      ContractResolver = new CamelCasePropertyNamesContractResolver(),
+      Formatting = Formatting.None,
+  });
+
+_ = page.SetValue("DocumentPageTemplateConfiguration", config);
+```
+
+:::
+
+## Razor
+
+### Keep View Injected Dependencies Minimal
+
+<Recommend />
+
+### Break up Layout Into Smaller View Components
+
+<Recommend />
+
+:::tip
+You can read more about this topic in the blog post
+[Kentico Xperience Design Patterns: Good Layout Hygiene](https://dev.to/seangwright/kentico-xperience-design-patterns-good-layout-hygiene-3ob6)
+:::
+
+### View Components vs Partial Views
+
+<Recommend />
+
+- Leverage View Components over Partial Views
+  - Better type checking, intellisense
 
 ### Use Tag Helpers intead of HTML Helpers
 
