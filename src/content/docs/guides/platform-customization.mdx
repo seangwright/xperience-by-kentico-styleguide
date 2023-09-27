@@ -8,6 +8,24 @@ import Suggest from "/src/components/icons/Suggest.astro";
 
 ## Custom Modules
 
+### Store modifable configuration in a Custom Module
+
+<Suggest />
+
+- Create [a Custom Module](https://docs.xperience.io/x/AKDWCQ) Object Type
+  - (optional) [Follow this guide](https://www.goldfinch.me/blog/creating-a-custom-module-in-xperience-by-kentico/)
+- Model the Object Type to store all the required Administration modifiable custom settings
+- Modify these settings per environment, at runtime, as neeeded
+
+**Why?**
+
+Some configuration needs to be editable at runtime. Typically, configuration found in `appsettings.json` files
+is not accessible to site administrators and could require an application restart for the application to read
+updated values.
+
+Settings modeled in a Custom Module Data Type are accessible by the application as soon as they are updated,
+making them useful for values that need to be changed as need arises without require a deployment or access to the hosting environment.
+
 ### One Custom Module Per Object Type
 
 <Recommend />

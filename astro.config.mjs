@@ -34,6 +34,10 @@ export default defineConfig({
               link: "/guides/solution-setup",
             },
             {
+              label: ".NET and C#",
+              link: "/guides/dotnet-csharp",
+            },
+            {
               label: "Platform Customization",
               link: "/guides/platform-customization",
             },

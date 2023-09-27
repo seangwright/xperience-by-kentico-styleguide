@@ -3,3 +3,151 @@ title: Solution Setup
 description: Guidance for setting up an Xperience by Kentico repository and .NET solution.
 ---
 
+import Recommend from "/src/components/icons/Recommend.astro";
+import Suggest from "/src/components/icons/Suggest.astro";
+
+## Documentation
+
+### Use a repository `README.md`
+
+<Recommend />
+
+- Add a `README.md` to the root of your repository
+- Write a brief description of the project
+- Detail steps to get the project running for local development
+- Explain the process for contributing to
+
+**Why?**
+
+New developers on the project will reference a `README.md` to orient themselves in the project.
+Setup instructions will help them troubleshoot working on the application.
+
+**Why?**
+
+Having project information in a `README.md` that exists in the project's repository (co-located)
+increases the likelihood of the information being kept up to date as the project changes.
+
+### Enhance the `README.md`
+
+<Suggest />
+
+- Create a table that lists the details of Web and Database Server details for each environment
+- List project features and integrations
+- Link to other project documentation
+  - [Maintain Architectural Decision Records (ADR)](#maintain-architectural-decision-records-adr)
+  - [Commit SQL scripts](#commit-sql-scripts)
+- Include a [Mermaid.js](https://github.com/mermaid-js/mermaid) diagram of the project architecture
+
+**Why?**
+
+Environment information (URLs, Server Names) is often implicit knowledge on a team. Detailing this in the project `README.md` makes it discoverable and maintainable, reducing information silos.
+
+**Why?**
+
+A list of features and integrations is a good high level substitute for package and infrastructure dependencies in an application. This list often shows what the volatile dependencies and complex areas of an application are.
+
+### Maintain Architectural Decision Records (ADR)
+
+<Suggest />
+
+- Create an `ADR.md` file in the root of your project's repository
+- Add a dated entry as a record of each significant architecture addition or change
+- Include the entry as part of a code review process
+
+**Why?**
+
+Business rule and project requirement changes are often recorded by project management or stakeholders, but the impact that these changes have on an application can easily be forgotten. An `ADR` file encourages recording a history of changes that developers can consult in the future to better understand decisions made in the past.
+
+**Why?**
+
+An ADR entry should include details about an architectural decision. If there were multiple solutions available, the entry should describe each one, including their pros/cons, and why the chosen solution was selected. Writing out this decision making process can help reflect on the _why_ of a change and expressing explicitly any implications of the solution.
+
+:::tip[What is an Architectural Decision Record?]
+An Architectural Decision (AD) is a software design choice that addresses a functional or non-functional requirement that is architecturally significant.
+_[https://adr.github.io/](https://adr.github.io/)_
+
+---
+
+An Architecture Decision Record is a tool for documenting a decision that has been made (or is under discussion) related to the architecture of a particular system or application.
+_[https://ardalis.com/getting-started-with-architecture-decision-records/](https://ardalis.com/getting-started-with-architecture-decision-records/)_
+:::
+
+## Organization
+
+### Use Feature Folders (Vertical Slice Architecture)
+
+<Recommend />
+
+- Create folders in a .NET and Node.js projects based on a feature
+- Organize and architect classes to be feature-oriented
+
+**Why?**
+
+Developers work on features so organizing code by feature helps developers find many of
+the pieces of code they need to modify when working on a feature. If they need to create new code for a feature,
+it's obvious, based on the feature-oriented organization, where that code should go in a project.
+
+**Why?**
+
+Projects organized by features are more comprehensible because the feature folders end up being
+a list of the application's main entry points an functionality. The feature folders also aid in revealing
+the complexity level of a given feature compared to another.
+
+**Why?**
+
+Feature folders encourage developers to think about functionality as a [Vertical Slice](https://codeopinion.com/restructuring-to-a-vertical-slice-architecture/),
+which is an architecture that leads to features that are easier to work on without incurring regressions elsewhere in an application. Vertical slices are also
+easier to separate into their own applications if they end up having unique scalability or deployment requirements.
+
+:::danger[Avoid organizing by type]
+Developers are never tasked to work on "interfaces" or "view models". Instead they are tasked with
+resolving issues or creating new functionality for features. Organizing code by what 'type' of a thing
+it is (ex: "interface", "implementation", "factory", "view model") focuses too much on a somewhat arbitrary
+technical detail, while the real focus in a codebase should be on business use-case.
+:::
+
+## Visual Studio Solution
+
+### Create Solution Items folder
+
+<Recommend />
+
+- Add a new [folder in your .NET solution](https://docs.microsoft.com/en-us/visualstudio/ide/solutions-and-projects-in-visual-studio?view=vs-2022#solution-folder)
+  to contain items at the root of your project that should be visible in Visual Studio
+- It's common to name this folder `Solution Items`
+
+**Why?**
+
+.NET solutions have traditionally focused on source code and projects since they are a target for compilation. However,
+it's also common to have many files in a .NET repository that are not code or projects, like [README.md](#add-a-repository-readme-md) and `.gitignore` files.
+These should be viewable and editable in the same way that source code is editable. Having these files visible (in Visual Studio or Rider)
+makes them more likely to be edited and kept up to date.
+
+**Why?**
+
+Having a solution folder with a convention-based name makes it easier for developers to explore a project and find common non-code files.
+
+:::tip
+These items are normally visible in other IDEs (like VS Code), so this is mostly relevant for developers using Visual studio
+:::
+
+### Co-Locate source code and test code
+
+<Suggest />
+
+- In a .NET solution, keep test projects adjacent to the applications and libraries they are associated with
+- Create a solution folder for each project and place both the application (or library) and its test project in the solution folder
+
+**Why?**
+
+By co-locating tests and the source the tests were written for, the tests and code are more likely to stay in-sync.
+
+**Why?**
+
+Developers will be more likely to keep testing in mind when adding new features if they are reminded there is a place to add
+tests in the solution and they don't have to go hunt down the correct test project.
+
+**Why?**
+
+Solution folders are a virtual organizational tool for .NET projects. This means source code and test code can still
+be located in different paths on the file system (ex: `src/` and `test/`) even if they are co-located in the solution.

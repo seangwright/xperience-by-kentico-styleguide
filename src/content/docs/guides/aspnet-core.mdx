@@ -6,6 +6,181 @@ description: ASP.NET Core configuration and feature usage guidance for Xperience
 import Recommend from "/src/components/icons/Recommend.astro";
 import Suggest from "/src/components/icons/Suggest.astro";
 
+## Configuration
+
+### Store Environment-Specific Configuration in appsettings.json
+
+<Suggest />
+
+- Use `appsettings.json` to store configuration that is environment specific
+- Structure configuration hierarchically using JSON
+- Provide intelligent defaults when reading in configuration in the ASP.NET Core application
+
+**Why?**
+
+Test and Production aren't the only environments that developers need to consider. "Local"
+is likely the environment where developers need the most control over configuration and
+[user secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=windows)
+allows for easy customization that is scoped to each developer's individual workspace.
+
+**Why?**
+
+Values deployed to the application file system in production are more secure than
+[Administration accessible settings](https://docs.xperience.io/x/7YjFC) which can be read and updated by an administrator.
+If configuration needs to be more secure and does not need to be edited while the application is running,
+`appsettings.json` is a better source of values than Admin settings.
+
+**Why?**
+
+All [CI/CD](https://youtu.be/scEDHsr3APg) systems have a way to populate configuration files with
+environment-specific or security-sensitive values _after_ an application build has completed but _before_ the
+build artifact is deployed to an environment. These values (ex: database connection strings, API keys) are
+stored with their own security settings to ensure they cannot be read or updated without specific permissions.
+
+### Fluent Builder APIs for DI and Middleware Registration
+
+<Recommend />
+
+- Create extension methods to abstract application setup out of `Startup.cs` or `Program.cs`
+- Use a [fluent builder API pattern](https://medium.com/@martinstm/fluent-builder-pattern-c-4ac39fafcb0b) to keep setup readable
+- Add helper extension methods to make non-fluent setup APIs chainable
+
+**Why?**
+
+Application setup code is often very declarative without much conditional logic and it describes what the application
+uses and what it does, rather than how it does it. To make setup code more readable, a fluent builder API can remove
+unnecessary syntax and read more like a table of contents than C# code.
+
+```csharp
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services) =>
+        services
+            .AddAppXperience()
+            .AddAppMembership()
+            .AddAppMVC()
+            .AddAppCore(Environment, Config);
+}
+```
+
+It's very clear, from a high level, what the major areas of functionality are of this application,
+and these extension methods can be made more or less high level depending on the application's complexity.
+
+**Why?**
+
+The same pattern can be followed for defining the ASP.NET Core middleware pipeline, which is already
+a very declarative section of the application:
+
+```csharp
+public class Startup
+{
+    public void Configure(IApplicationBuilder app) =>
+        app
+            .InitKentico()
+            .IfDevelopment(Environment, a => a
+                .UseDeveloperExceptionPage())
+            .IfNotDevelopment(Environment, a => a
+                .UseExceptionHandler(new ExceptionHandlerOptions
+                {
+                    AllowStatusCode404Response = true,
+                    ExceptionHandlingPath = "/error"
+                })
+            )
+            .UseHttpsRedirection()
+            .UseStaticFiles()
+            .UseStatusCodePagesWithReExecute("/not-found", "?code={0}")
+            .IfDevelopment(Environment, a => a
+                .UseSwagger()
+                .UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1")))
+            .UseKentico()
+            .UseAuthentication()
+            .UseEndpoints(endpoints =>
+            {
+                endpoints.Kentico().MapRoutes();
+
+                _ = endpoints.MapControllers();
+            });
+}
+```
+
+**Why?**
+
+Each extension method can then call additional extension methods. Since application setup is not stateful and
+lacks logic, there's no harm in using `static` extension methods and avoiding intermediate variables.
+
+**Why?**
+
+An organized, high-level `Startup.cs` will be easier to adapt to the new [ASP.NET Core minimal startup](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/startup?view=aspnetcore-6.0)
+
+::: tip Maintaining Startup.cs
+
+To learn more about how to organize and maintain a `Startup.cs` file, read [Kentico Xperience Design Patterns: Good Startup.cs Hygiene](https://dev.to/seangwright/kentico-xperience-design-patterns-good-startup-cs-hygiene-3klm)
+
+:::
+
+### Group Extensions Based on Sub-System
+
+<Suggest />
+
+- Create separate static configuration classes for each area of functionality in an application
+- Create separate static `IServiceCollection` extension methods in those classes for each group of dependencies within a feature
+
+**Why?**
+
+These extensions tell a story about what features and dependencies your app has. With these extension classes and methods, looking at `Startup.cs` will quickly show what kinds of things an application does.
+
+Examples:
+
+```csharp
+public static class ECommerceConfiguration
+{
+    public static IServiceCollection AddEcommerce(this IServiceCollection services) =>
+        services
+            .AddStripe();
+
+    private static IServiceCollection AddStripe(this IServiceCollection services)
+    {
+        // ...
+    }
+}
+
+public static class ApplicationConfiguration
+{
+    public static IServiceCollection AddApplicationCore(this IServiceCollection services) =>
+        services
+            .AddXMLSitemaps();
+
+    private static IServiceCollection AddXMLSitemaps(this IServiceCollection services)
+    {
+        // ...
+    }
+}
+
+public static class IntegrationConfiguration
+{
+    public static IServiceCollection AddLegacyIntegration(this IServiceCollection services) =>
+        services
+            .AddActiveDirectory();
+
+    public static IServiceCollection AddActiveDirectory(this IServiceCollection services)
+    {
+        // ...
+    }
+}
+```
+
+### Use Reflection vs Manual DI Registration
+
+<Suggest />
+
+- Use reflection for registering types with many implementations
+- Use a library like [Scrutor](https://github.com/khellang/Scrutor) for more powerful DI registration
+
+**Why?**
+
+One of the benefits of a DI conatiner is its ability to construct types for you through its access to all
+constructable types in an application.
+
 ## Razor
 
 ### Use the View Component Tag Helper
@@ -27,16 +202,9 @@ for non-Xperience View Components follows this convention.
 
 The View Component Tag Helper will provide syntax highlighting, auto-completion, and parameter hints in most editors.
 
-Invoking a View Component with C# [provides no type safety](https://learn.microsoft.com/en-us/aspnet/core/mvc/views/view-components?view=aspnetcore-7.0#invoke-a-view-component-1)
+Invoking a View Component with C# using `@await Component.InvokeAsync()`
+[provides no type safety](https://learn.microsoft.com/en-us/aspnet/core/mvc/views/view-components?view=aspnetcore-7.0#invoke-a-view-component-1)
 for the component or its parameters, so it is almost always a worse developer experience than the View Component Tag Helper.
-
-:::danger[Don't]
-Don't use the `@await Component.InvokeAsync()` C# method to render View Components
-:::
-
-:::tip[Do]
-Use the `<vc:your-component />` Tag Helper to render View Components
-:::
 
 ### Move Razor configuration to the application root
 
@@ -65,6 +233,47 @@ application root to ensure they are shared across the entire project's Razor Vie
 This is a valid location for these files in ASP.NET Core projects and is a better
 default for Xperience by Kentico projects heavy reliance on Razor template rendering.
 
+### Co-Locate Controllers, View Models, and Views
+
+<Recommend />
+
+- Place Controllers, View Models, and Views all in the same [feature folder](#feature-folders-vertical-slice-architecture)
+- Define Controllers (or View Component classes) and their View Model classes in the same file
+
+**Why?**
+
+The majority of code in an ASP.NET Core MVC application is related to presentation of information.
+Models, Views, and Controllers are all presentation concerns and are all edited together - a change in a View Model typically results
+in a change in both a Controller and View. By co-locating these files we aren't breaking some rule of 'separation of concerns'
+since all of these files are for the same (presentation) concern. Instead we are making our lives easier when working
+in the project since we won't need to jump around the project folder hierarchy every time we make a change to presentation functionality.
+
+**Why?**
+
+Most developers working on a Kentico Xperience application won't only work in C# files or Razor Views - we tend to
+have responsibilities for all areas of content presentation. Separating Views into their own folder creates
+an artificial barrier that doesn't align with developer workloads.
+
+**Why?**
+
+View Models only exist to pass data from Controllers (and View Component classes) to Views. They are never used
+outside of this role and they are typically unique to a Controller/View pair. This means these files are all tightly coupled.
+While too many lines of code in a single file _can_ be a code smell, this is typically only when a single unit of encapsulation (class, method)
+has too many lines.
+
+There's nothing wrong with defining multiple classes in the same file, especially when they are tightly coupled, and co-locating
+them will help increase developer productivity when working on these types.
+
+:::caution
+This organization of files does not work well with Visual Studio file scaffolding conventions for ASP.NET Core components.
+
+However, this shouldn't be an issue with most Xperinece by Kentico projects because developers are not doing traditional
+MVC development and instead Xperience often handles most of the Controller behavior. Instead, Xperinece developers create
+Page Templates, Page Builder components, and UI Form Components, which Visual Studio does not scaffold.
+
+Note: The MVC scaffolding was designed to copy Ruby on Rails' convenient scaffolding CLI commands 10-12 years ago.
+:::
+
 ### Name View files by their Page or Component
 
 <Suggest />
@@ -86,10 +295,6 @@ name is too generic to be helpful.
 View Component, Page Template, and MVC View files should be organized by feature folder
 next to their component. This naming convention will alphabetically group the files in your editor.
 
-:::tip[Do]
-Name View files to match their use case.
-:::
-
 ```
 🌳 ~/Features
  |
@@ -103,3 +308,51 @@ Name View files to match their use case.
  |       └── 📄 BlogPostDetailViewComponent.cs
  └── ...
 ```
+
+### Multiple Coupled Types per-file
+
+<Recommend />
+
+- Keep coupled classes/types in the same file
+  - Example: Request parameters, Controllers/View Components, and View Models
+  - Example: DTOs and the methods that produce them
+
+**Why?**
+
+The C# convention of 1 class per file was more beneficial when defining types in C# was much more verbose.
+Today, [C# record types](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/tutorials/records#characteristics-of-records)
+(introduced in C# 9 / .NET 5) offer an extremely terse type definition with primary constructors.
+Often types can be defined on a single line.
+
+[File scoped usings](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-10.0/file-scoped-namespaces)
+and [global/implicit usings](https://www.daveabrock.com/2021/10/21/csharp-10-global-usings/), both introduced in C# 10 / .NET 6,
+also decrease the amount of boilerplate per file.
+The result is that a record defined as `public record User(string Name, string Email);` might be _the only line in a file_
+if we follow the 1 class per file rule.
+
+**Why?**
+
+Co-locating code that changes together is always preferable over spreading this code across a project.
+Similar to how [feature folder](#feature-folders-vertical-slice-architecture) improve productivity,
+including related types in the same file can make them easier to find, understand, and edit.
+
+Editors also include shortcuts to quickly navigate to a symbol, which can be much faster than visually navigating through
+a folder structure to find a file.
+
+- VS Code: `ctrl + T` (Go to Symbol in Workspace)
+- Visual Studio: `ctrl + T` (Go to)
+- Rider: `ctrl + alt + shift + T` (Navigate | Go to Symbol)
+
+Once you open the file with the type you are looking for, you can find the related types in the same file.
+
+**Why?**
+
+Finding a file is too long when including related types together might be a good sign of too much complexity in those types.
+It can also be a good indicator that you are including things that aren't actually related.
+For example, the View Model returned by a Controller action is often more related to that action method than
+a completely separate action that's been bundled in the same Controller for convenience.
+
+:::tip [Kentico Xperience Design Patterns: Multiple Types Per File]
+A more detailed explanation can be read in the blog post
+[Kentico Xperience Design Patterns: Multiple Types Per File](https://dev.to/seangwright/kentico-xperience-design-patterns-multiple-types-per-file-1a99)
+:::
