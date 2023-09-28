@@ -6,8 +6,6 @@ description: Guidance for using Xperience by Kentico's Page Builder technology.
 import Recommend from "/src/components/icons/Recommend.astro";
 import Suggest from "/src/components/icons/Suggest.astro";
 
-- Use the Page Builder Mode Tag Helper for better Content Management UX
-
 ## Routing
 
 ### Default to using Page Templates (+ View Components)
@@ -15,12 +13,26 @@ import Suggest from "/src/components/icons/Suggest.astro";
 <Recommend />
 
 - Use Page Templates as the default rendering approach for [Content Tree Routing](https://docs.xperience.io/x/GoXWCQ)
+- Use View Components within Page Template Views [to handle additional data retrieval and logic](https://dev.to/seangwright/kentico-xperience-design-patterns-mvc-is-dead-long-live-ptvc-4635)
+- Fallback to MVC and Controllers [only when lower-level control is required](https://dev.to/seangwright/kentico-xperience-design-patterns-mvc-is-dead-long-live-ptvc-4635#benefits-of-ptvc-over-mvc)
+
+**Why?**
+
+Page Templates provide a great place to manage page-level design customization with Page Template properties -
+something Controller routing and Route-to-View routing do not have.
+
+**Why?**
+
+Page Templates enabling toggling between several designs for a given page, or
+growing the number of layouts as a solution matures.
+This is also possible with Controller routing, but developers will need to re-create
+the functionality.
 
 :::caution
-If you use Page Templates for a Page Type, and don't have a fallback Razor View for [Basic Routing](https://docs.xperience.io/x/HoXWCQ),
-then any Pages of this Page Type defined through the API will need to have their `DocumentPageTemplateConfiguration` field manually set with a valid value.
+If you use Page Templates for a Content Type, and don't have a fallback Razor View for [Basic Routing](https://docs.xperience.io/x/HoXWCQ),
+then any Pages of this Content Type defined through the API will need to have their `DocumentPageTemplateConfiguration` field manually set with a valid value.
 
-You can resolve this by assigning a Page Template to a Page programmatically when it's created:
+You can resolve this by assigning a Page Template to a Page programmatically when it's created.
 
 ```csharp
 var page = new HomePage();
@@ -39,26 +51,6 @@ _ = page.SetValue("DocumentPageTemplateConfiguration", config);
 :::
 
 ## Razor
-
-### Keep View Injected Dependencies Minimal
-
-<Recommend />
-
-### Break up Layout Into Smaller View Components
-
-<Recommend />
-
-:::tip
-You can read more about this topic in the blog post
-[Kentico Xperience Design Patterns: Good Layout Hygiene](https://dev.to/seangwright/kentico-xperience-design-patterns-good-layout-hygiene-3ob6)
-:::
-
-### View Components vs Partial Views
-
-<Recommend />
-
-- Leverage View Components over Partial Views
-  - Better type checking, intellisense
 
 ### Use Tag Helpers intead of HTML Helpers
 
@@ -244,7 +236,7 @@ Create a simple abstraction to organize identifiers and include a static alias i
 for easy access.
 :::
 
-````csharp
+```csharp
 // ~/Components/Widgets/WidgetIdentifiers.cs
 namespace Sandbox.Components.Widgets;
 
@@ -275,11 +267,5 @@ public static class WidgetIdentifiers
 
     // ...
 }
-
-```csharp
-
-````
-
-```
 
 ```

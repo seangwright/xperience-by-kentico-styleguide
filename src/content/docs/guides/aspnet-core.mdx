@@ -183,6 +183,68 @@ constructable types in an application.
 
 ## Razor
 
+### Keep View Injected Dependencies Minimal
+
+<Recommend />
+
+- Only perform presentational logic inside a Razor View
+- Use data retrieval and business logic to prepare View Models outside of Razor View files
+- Consider Models in Razor Views as prepared and ready to be used
+
+**Why?**
+
+Razor Views are difficult to debug and are not meant for error handling.
+By preparing a View Model in advance, we can trust the Model we have access
+to in a View is fully populated and ready to be used without encoutering and error.
+
+If any errors are going to be encountered when rendering a Views, this would occur when the View Model
+is being prepared.
+
+**Why?**
+
+Although ASP.NET Core enables View service injection using the `@inject` Razor directive,
+this feature should be used for a limited set of use cases - e.g localization, JSON serialization.
+
+### Break up Layout Into Smaller View Components
+
+<Recommend />
+
+- Limit the size of the `_Layout.cshtml` file.
+- Abstract sections of page layout (like `<meta>`, `<link>` or `<script>` elements) into View Components
+- Simplify the `_Layout.cshtml` to tell a story about how the page is structured and what assets are used on it.
+
+**Why?**
+
+The main solution `_Layout.cshtml` will tend to grow over time, with new asset links and metadata tags being
+added regularly.`Manage this growing complexity continuosly by componentizing sections
+of the`\_Layout.cshtml` and moving them to View Components.
+
+**Why?**
+
+Somewhere in a `_Layout.cshtml` you'll likely want to use an injected service to populate
+a dynamic value. Instead of injecting this service into the View, injected it into a
+View Component which then renders the dynamic `_Layout.cshtml` content.
+
+**Why?**
+
+Keeping a `_Layout.cshtml` readable will keep _every page_ in a solution slightly more
+readable and maintainable because the `_Layout.cshtml` is used acrros a solution.
+
+:::tip
+You can read more about this topic in the blog post
+[Kentico Xperience Design Patterns: Good Layout Hygiene](https://dev.to/seangwright/kentico-xperience-design-patterns-good-layout-hygiene-3ob6)
+:::
+
+### View Components vs Partial Views
+
+<Recommend />
+
+- If a section of a View is being abstracted into its own part, consider using a View Component over a Partial View
+
+**Why?**
+
+Better type checking, intellisense
+
 ### Use the View Component Tag Helper
 
 <Recommend />
@@ -352,7 +414,7 @@ It can also be a good indicator that you are including things that aren't actual
 For example, the View Model returned by a Controller action is often more related to that action method than
 a completely separate action that's been bundled in the same Controller for convenience.
 
-:::tip [Kentico Xperience Design Patterns: Multiple Types Per File]
+:::tip[Kentico Xperience Design Patterns: Multiple Types Per File]
 A more detailed explanation can be read in the blog post
 [Kentico Xperience Design Patterns: Multiple Types Per File](https://dev.to/seangwright/kentico-xperience-design-patterns-multiple-types-per-file-1a99)
 :::
